@@ -172,20 +172,24 @@ export function WelcomeScreen() {
 
   const removeFile = useCallback(
     (path: string) => {
-      const idx = uploadedFiles.findIndex((f) => f.path === path);
-      const newFiles = uploadedFiles.filter((f) => f.path !== path);
-      const newRawFiles = [...rawFiles];
-      if (idx >= 0) newRawFiles.splice(idx, 1);
-      setUploadedFiles(newFiles);
-      setRawFiles(newRawFiles);
+      // 直接从 store 获取最新状态并过滤
+      const currentUploaded = useTranslatorStore.getState().uploadedFiles;
+      const currentRaw = useTranslatorStore.getState().rawFiles;
+      
+      setUploadedFiles(currentUploaded.filter(f => f.path !== path));
+      setRawFiles(currentRaw.filter(file => (file.webkitRelativePath || file.name) !== path));
+      // 清理 sourceFiles 中对应的内容
+      useTranslatorStore.getState().removeSourceFile(path);
     },
-    [uploadedFiles, setUploadedFiles, setRawFiles, rawFiles]
+    []
   );
 
   const clearAll = useCallback(() => {
     setUploadedFiles([]);
     setRawFiles([]);
-  }, [setUploadedFiles, setRawFiles]);
+    // 清空所有 sourceFiles
+    useTranslatorStore.setState({ sourceFiles: {} });
+  }, []);
 
   const formatSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
