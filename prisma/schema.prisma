@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model TranslationHistory {
+  id            String   @id @default(cuid())
+  sessionId     String
+  sourceLang    String
+  targetLang    String
+  sourceFiles   String   // JSON array of file paths
+  translatedFiles String // JSON object of {path: content}
+  status        String   // "analyzing" | "translating" | "verifying" | "complete" | "error"
+  fileCount     Int      @default(0)
+  translatedCount Int    @default(0)
+  llmModel      String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
