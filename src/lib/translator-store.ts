@@ -115,6 +115,7 @@ interface TranslatorState {
   setUploadedFiles: (files: FileEntry[]) => void;
   setRawFiles: (files: File[]) => void;
   setSourceFile: (path: string, content: string) => void;
+  removeSourceFile: (path: string) => void;
   setTranslatedFile: (path: string, content: string) => void;
   setAnalysis: (analysis: Record<string, unknown> | null) => void;
   setWsConnected: (connected: boolean) => void;
@@ -188,6 +189,12 @@ export const useTranslatorStore = create<TranslatorState>((set, get) => ({
     set((state) => ({
       sourceFiles: { ...state.sourceFiles, [path]: content },
     })),
+  removeSourceFile: (path) =>
+    set((state) => {
+      const newSourceFiles = { ...state.sourceFiles };
+      delete newSourceFiles[path];
+      return { sourceFiles: newSourceFiles };
+    }),
   setTranslatedFile: (path, content) =>
     set((state) => ({
       translatedFiles: { ...state.translatedFiles, [path]: content },
